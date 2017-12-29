@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<alloy>
+
+<view>
+
+<defaultnode/>
+
+<defaultedge/>
+
+<node>
+   <type name="Event"/>
+   <type name="Fence"/>
+   <type name="FenceI"/>
+   <type name="Hart"/>
+   <type name="Int"/>
+   <type name="Load"/>
+   <type name="MemoryEvent"/>
+   <type name="Store"/>
+   <type name="String"/>
+   <type name="univ"/>
+   <type name="seq/Int"/>
+   <set name="$FencePRSR" type="Fence"/>
+   <set name="$FencePRSW" type="Fence"/>
+   <set name="$FencePWSR" type="Fence"/>
+   <set name="$FencePWSW" type="Fence"/>
+   <set name="$RFInit" type="Load"/>
+</node>
+
+<node visible="no">
+   <type name="Address"/>
+</node>
+
+<edge visible="no">
+   <relation name="$rsw"> <type name="Load"/> <type name="Load"/> </relation>
+   <relation name="gmo"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
+   <relation name="pr"> <type name="Fence"/> <type name="Fence"/> </relation>
+   <relation name="pw"> <type name="Fence"/> <type name="Fence"/> </relation>
+   <relation name="sr"> <type name="Fence"/> <type name="Fence"/> </relation>
+   <relation name="sw"> <type name="Fence"/> <type name="Fence"/> </relation>
+</edge>
+
+<edge visible="no" attribute="yes">
+   <relation name="address"> <type name="MemoryEvent"/> <type name="Address"/> </relation>
+   <relation name="aq"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
+   <relation name="sc"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
+</edge>
+
+</view>
+
+</alloy>
