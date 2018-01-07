@@ -20,8 +20,8 @@ fun ppo : Event->Event {
   + ctrl :> Store
   + (addr+data).successdep
 
-  // CoRR
-  + rdw & po_loc_no_intervening_write
+  // RDW
+  + (po_loc & (fre.rfe))
 
   // pipeline dependency artifacts
   + (addr+data).rfi
@@ -108,13 +108,7 @@ fun ppo_fence : MemoryEvent->MemoryEvent {
 }
 
 // auxiliary definitions
-fun po_loc_no_intervening_write : MemoryEvent->MemoryEvent {
-  po_loc - ((po_loc :> Store).po_loc)
-}
-
 fun RFInit : Load { Load - Store.rf }
-fun rsw : Load->Load { ~rf.rf + (RFInit <: address.~address :> RFInit) }
-fun rdw : Load->Load { (Load <: po_loc :> Load) - rsw }
 
 fun po_loc : Event->Event { ^po & address.~address }
 fun same_hart[e: Event] : set Event { e + e.^~po + e.^po }
@@ -128,7 +122,13 @@ fact { total[gmo, MemoryEvent] } // gmo is a total order over all MemoryEvents
 
 //rf
 fact { rf in address.~address }
-fun rfi : Store->Load { Store <: po_loc_no_intervening_write :> Load }
+fun internal : Event->Event { Event <: (*po + *~po) :> Event }
+fun rfi : Store->Load { rf & internal }
+fun rfe : Store->Load { rf - internal }
+fun fr : Load->Store {
+  ((~rf.gmo) + (RFInit <: Event->Event)) & (address.~address :> Store)
+}
+fun fre : Load->Store { fr - internal }
 
 //dep
 fact { addr + ctrl + data in ^po }

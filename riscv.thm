@@ -31,7 +31,9 @@
 </node>
 
 <edge visible="no">
-   <relation name="$rsw"> <type name="Load"/> <type name="Load"/> </relation>
+   <relation name="$fre"> <type name="Load"/> <type name="Store"/> </relation>
+   <relation name="$internal"> <type name="Event"/> <type name="Event"/> </relation>
+   <relation name="$rfe"> <type name="Store"/> <type name="Load"/> </relation>
    <relation name="gmo"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
    <relation name="pr"> <type name="Fence"/> <type name="Fence"/> </relation>
    <relation name="pw"> <type name="Fence"/> <type name="Fence"/> </relation>
