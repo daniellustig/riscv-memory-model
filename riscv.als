@@ -93,12 +93,12 @@ sig Fence extends Event {
   sw: lone Fence  // opcode bit
 }
 sig FenceI extends Event {}
-   
+
 // FENCE PPO
-fun FencePRSR : Fence { Fence.(pr & sr) } 
-fun FencePRSW : Fence { Fence.(pr & sw) } 
-fun FencePWSR : Fence { Fence.(pw & sr) } 
-fun FencePWSW : Fence { Fence.(pw & sw) } 
+fun FencePRSR : Fence { Fence.(pr & sr) }
+fun FencePRSW : Fence { Fence.(pr & sw) }
+fun FencePWSR : Fence { Fence.(pw & sr) }
+fun FencePWSW : Fence { Fence.(pw & sw) }
 
 fun ppo_fence : MemoryEvent->MemoryEvent {
     (Load  <: ^po :> FencePRSR).(^po :> Load)
