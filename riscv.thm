@@ -8,22 +8,47 @@
 <defaultedge/>
 
 <node>
+   <type name="AMO"/>
    <type name="Event"/>
    <type name="Fence"/>
-   <type name="FenceI"/>
-   <type name="Hart"/>
+   <type name="FenceTSO"/>
    <type name="Int"/>
-   <type name="Load"/>
+   <type name="LoadNormal"/>
+   <type name="LoadReserve"/>
    <type name="MemoryEvent"/>
-   <type name="Store"/>
+   <type name="NOP"/>
+   <type name="StoreConditional"/>
+   <type name="StoreNormal"/>
    <type name="String"/>
    <type name="univ"/>
    <type name="seq/Int"/>
+   <set name="$lkmm_rel_acq_a" type="Event"/>
+   <set name="$lkmm_rel_acq_b" type="Event"/>
+   <set name="$lkmm_rel_acq_c" type="Event"/>
+   <set name="$lkmm_rel_acq_d" type="Event"/>
+   <set name="$lkmm_rel_acq_e" type="Event"/>
+   <set name="$lkmm_rel_acq_f" type="Event"/>
+   <set name="$lkmm_rel_acq_x" type="Address"/>
+   <set name="$lkmm_rel_acq_y" type="Address"/>
+   <set name="$lkmm_rel_acq_z" type="Address"/>
+</node>
+
+<node color="Blue">
+   <set name="$Init" type="Event"/>
+</node>
+
+<node color="Green">
+   <type name="Hart"/>
+</node>
+
+<node showlabel="no">
    <set name="$FencePRSR" type="Fence"/>
    <set name="$FencePRSW" type="Fence"/>
-   <set name="$FencePWSR" type="Fence"/>
-   <set name="$FencePWSW" type="Fence"/>
-   <set name="$RFInit" type="Load"/>
+   <set name="$Load" type="Event"/>
+   <set name="$NonInit" type="Event"/>
+   <set name="$RCsc" type="MemoryEvent"/>
+   <set name="$Release" type="MemoryEvent"/>
+   <set name="$Store" type="Event"/>
 </node>
 
 <node visible="no">
@@ -31,20 +56,23 @@
 </node>
 
 <edge visible="no">
-   <relation name="$fre"> <type name="Load"/> <type name="Store"/> </relation>
-   <relation name="$internal"> <type name="Event"/> <type name="Event"/> </relation>
-   <relation name="$rfe"> <type name="Store"/> <type name="Load"/> </relation>
-   <relation name="gmo"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
-   <relation name="pr"> <type name="Fence"/> <type name="Fence"/> </relation>
-   <relation name="pw"> <type name="Fence"/> <type name="Fence"/> </relation>
-   <relation name="sr"> <type name="Fence"/> <type name="Fence"/> </relation>
-   <relation name="sw"> <type name="Fence"/> <type name="Fence"/> </relation>
+   <relation name="$fr"> <type name="Event"/> <type name="Event"/> </relation>
+   <relation name="$po_loc"> <type name="Event"/> <type name="Event"/> </relation>
+   <relation name="$ppo"> <type name="Event"/> <type name="Event"/> </relation>
+   <relation name="$ppo_fence"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
+   <relation name="$rfi"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
 </edge>
 
 <edge visible="no" attribute="yes">
+   <relation name="acquireRCpc"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
+   <relation name="acquireRCsc"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
    <relation name="address"> <type name="MemoryEvent"/> <type name="Address"/> </relation>
-   <relation name="aq"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
-   <relation name="sc"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
+   <relation name="pr"> <type name="Fence"/> <type name="Fence"/> </relation>
+   <relation name="pw"> <type name="Fence"/> <type name="Fence"/> </relation>
+   <relation name="releaseRCpc"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
+   <relation name="releaseRCsc"> <type name="MemoryEvent"/> <type name="MemoryEvent"/> </relation>
+   <relation name="sr"> <type name="Fence"/> <type name="Fence"/> </relation>
+   <relation name="sw"> <type name="Fence"/> <type name="Fence"/> </relation>
 </edge>
 
 </view>
