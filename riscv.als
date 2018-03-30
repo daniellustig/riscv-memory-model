@@ -7,7 +7,7 @@
 fun ppo : Event->Event {
   // same-address ordering
   po_loc :> Store
-  + (AMO + StoreConditional) <: po_loc
+  + (AMO + StoreConditional) <: rfi
   + rdw
 
   // explicit synchronization
@@ -344,11 +344,13 @@ run lkmm_rel_acq_fence_tso {
     and ((a in Store and f in Store)
       or (a in Load  and f in Store)
       or (a in Load  and f in Load))
-    and ((b in FenceTSO       and c in StoreNormal                  & z.~address)
-      or (b in Fence.pw.sw    and c in StoreNormal.releaseRCsc      & z.~address)
-      or (b in Fence.pr.pw.sw and c in StoreConditional             & z.~address)
-      or (                        c in StoreConditional.releaseRCsc & z.~address)
-      or (                        c in AMO.releaseRCsc              & z.~address))
+    and ((b in FenceTSO       and c in StoreNormal                              & z.~address)
+      or (b in FenceTSO       and c in StoreNormal.releaseRCsc                  & z.~address) // <-- alternative mapping
+      or (                        c in StoreNormal.releaseRCsc.acquireRCsc      & z.~address) // <-- alternative mapping
+      or (b in FenceTSO       and c in StoreConditional                         & z.~address)
+      or (                        c in StoreConditional.releaseRCsc.acquireRCsc & z.~address) // <-- alternative mapping
+      or (b in Fence.pw.sw    and c in StoreConditional.releaseRCsc             & z.~address) // <-- alternative mapping
+      or (                        c in AMO.releaseRCsc                          & z.~address))
     and ((d in LoadNormal              & z.~address and e in Fence.pr.sr.sw)
       or (d in LoadNormal.acquireRCsc  & z.~address)
       or (d in LoadReserve             & z.~address and e in Fence.pr.sr.sw)
