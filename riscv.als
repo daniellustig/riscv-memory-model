@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // =RVWMO axioms=
 
-// See Chapter 2.9 in the RISC-V ISA Specification
+// See Chapter 6 in the RISC-V ISA Specification
 
 // Preserved Program Order
 fun ppo : Event->Event {
@@ -15,6 +15,7 @@ fun ppo : Event->Event {
   + Acquire <: ^po :> MemoryEvent
   + MemoryEvent <: ^po :> Release
   + RCsc <: ^po :> RCsc
+  + pair
 
   // syntactic dependencies
   + addrdep
@@ -51,7 +52,7 @@ pred Atomicity {
       and r.pair in x.^gmo        // and r follows x in gmo
 }
 
-// Progress Axiom - implicit
+// Progress Axiom implicit: Alloy only considers finite models
 
 pred RISCV_mm { LoadValue and Atomicity /* and Progress */ }
 
@@ -66,8 +67,6 @@ abstract sig Event {
   po: lone Event // program order
 }
 
-// .aq and .rl represent the opcode bits.  The ordering annotations assigned
-// to those bits are described further down.
 abstract sig MemoryEvent extends Event {
   address: one Address,
   acquireRCpc: lone MemoryEvent,
@@ -166,7 +165,6 @@ fun rfi : MemoryEvent->MemoryEvent { rf & (*po + *~po) }
 //dep
 fact { no StoreNormal <: (addrdep + ctrldep + datadep) }
 fact { addrdep + ctrldep + datadep + pair in ^po }
-fact { pair in datadep }
 fact { datadep in datadep :> Store }
 fact { ctrldep.*po in ctrldep }
 fact { no pair & (^po :> (LoadReserve + StoreConditional)).^po }
