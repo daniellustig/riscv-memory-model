@@ -315,18 +315,19 @@ run atoms {
 run lkmm_rel_acq_insufficient {
   some disj a, b, c, d, e, f: Event, z: Address |
     a->b + b->c + c->d + d->e + e->f in ^po
+    and c->d in rf
     and a in MemoryEvent
     and ((a in Store and f in Store)
       or (a in Load  and f in Store)
       or (a in Load  and f in Load))
     and ((b in Fence.pr.pw.sw and c in StoreNormal                  & z.~address)
-      or (                        c in StoreNormal.releaseRCsc      & z.~address)
       or (b in Fence.pr.pw.sw and c in StoreConditional             & z.~address)
       or (                        c in StoreConditional.releaseRCsc & z.~address)
       or (                        c in AMO.releaseRCsc              & z.~address))
     and ((d in LoadNormal              & z.~address and e in Fence.pr.sr.sw)
-      or (d in LoadNormal.acquireRCsc  & z.~address)
+      or (d in LoadNormal              & z.~address and e in Fence.pr.sr     and d->d.^po in ctrldep)
       or (d in LoadReserve             & z.~address and e in Fence.pr.sr.sw)
+      or (d in LoadReserve             & z.~address and e in Fence.pr.sr     and d->d.^po in ctrldep)
       or (d in LoadReserve.acquireRCsc & z.~address)
       or (d in AMO.acquireRCsc         & z.~address))
     and RISCV_mm  // <---
@@ -338,21 +339,44 @@ run lkmm_rel_acq_insufficient {
 run lkmm_rel_acq_fence_tso {
   some disj a, b, c, d, e, f: Event, z: Address |
     a->b + b->c + c->d + d->e + e->f in ^po
+    and c->d in rf
     and a in MemoryEvent
     and ((a in Store and f in Store)
       or (a in Load  and f in Store)
       or (a in Load  and f in Load))
-    and ((b in FenceTSO       and c in StoreNormal                              & z.~address)
-      or (b in FenceTSO       and c in StoreNormal.releaseRCsc                  & z.~address) // <-- alternative mapping
-      or (                        c in StoreNormal.releaseRCsc.acquireRCsc      & z.~address) // <-- alternative mapping
-      or (b in FenceTSO       and c in StoreConditional                         & z.~address)
-      or (                        c in StoreConditional.releaseRCsc.acquireRCsc & z.~address) // <-- alternative mapping
-      or (b in Fence.pw.sw    and c in StoreConditional.releaseRCsc             & z.~address) // <-- alternative mapping
-      or (                        c in AMO.releaseRCsc                          & z.~address))
+    and ((b in FenceTSO       and c in StoreNormal                  & z.~address)
+      or (b in FenceTSO       and c in StoreConditional             & z.~address)
+      or (                        c in StoreConditional.releaseRCsc & z.~address)
+      or (                        c in AMO.releaseRCsc              & z.~address))
     and ((d in LoadNormal              & z.~address and e in Fence.pr.sr.sw)
-      or (d in LoadNormal.acquireRCsc  & z.~address)
+      or (d in LoadNormal              & z.~address and e in Fence.pr.sr     and d->d.^po in ctrldep)
       or (d in LoadReserve             & z.~address and e in Fence.pr.sr.sw)
+      or (d in LoadReserve             & z.~address and e in Fence.pr.sr     and d->d.^po in ctrldep)
       or (d in LoadReserve.acquireRCsc & z.~address)
+      or (d in AMO.acquireRCsc         & z.~address))
+    and RISCV_mm  // <---
+    and f in MemoryEvent
+    and a->f not in ^ppo
+} for 10
+
+/* Alternatively, if we don't use LR.aq, we're also OK */
+run lkmm_rel_acq_no_lr_aq {
+  some disj a, b, c, d, e, f: Event, z: Address |
+    a->b + b->c + c->d + d->e + e->f in ^po
+    and c->d in rf
+    and a in MemoryEvent
+    and ((a in Store and f in Store)
+      or (a in Load  and f in Store)
+      or (a in Load  and f in Load))
+    and ((b in Fence.pr.pw.sw and c in StoreNormal                  & z.~address)
+      or (b in Fence.pr.pw.sw and c in StoreConditional             & z.~address)
+      or (                        c in StoreConditional.releaseRCsc & z.~address)
+      or (                        c in AMO.releaseRCsc              & z.~address))
+    and ((d in LoadNormal              & z.~address and e in Fence.pr.sr.sw)
+      or (d in LoadNormal              & z.~address and e in Fence.pr.sr     and d->d.^po in ctrldep)
+      or (d in LoadReserve             & z.~address and e in Fence.pr.sr.sw)
+      or (d in LoadReserve             & z.~address and e in Fence.pr.sr     and d->d.^po in ctrldep)
+   /* or (d in LoadReserve.acquireRCsc & z.~address) */
       or (d in AMO.acquireRCsc         & z.~address))
     and RISCV_mm  // <---
     and f in MemoryEvent
