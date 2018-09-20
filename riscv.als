@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // =RVWMO axioms=
 
-// See Chapter 6 in the RISC-V ISA Specification
+// See the RVWMO Chapter in the RISC-V Non-Privileged ISA Specification
 
 // Preserved Program Order
 fun ppo : Event->Event {
